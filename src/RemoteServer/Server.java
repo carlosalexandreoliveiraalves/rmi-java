@@ -14,8 +14,9 @@ public class Server {
 		
 		
 		try {
-			Registry registry = LocateRegistry.createRegistry(1099);
-			Naming.rebind("rmi://localhost:1099/Hello", new HelloImpl());
+			LocateRegistry.createRegistry(1099);
+			ChatServiceImpl chat = new ChatServiceImpl();
+			Naming.rebind("rmi://localhost:1099/chat", chat);
 			// implementação do objeto remoto no Registry usando Naming
 			// Naming cria o skeleton
 			System.out.println("Servidor aberto na porta 1099");
