@@ -31,4 +31,8 @@ public interface ChatService extends Remote {
     
     boolean exitOrTransferGroup(String groupName, String userName) throws RemoteException;
 	
+    void registerCallback(String userName, ClientCallback callback) throws RemoteException;
+    
+    void unregisterCallback(String userName) throws RemoteException;
+
 }

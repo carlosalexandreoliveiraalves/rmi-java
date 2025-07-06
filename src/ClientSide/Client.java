@@ -9,6 +9,7 @@ import java.util.Scanner;
 import RemoteInterface.ChatService;
 import RemoteInterface.Hello;
 import RemoteInterface.models.User;
+import RemoteServer.ClientCallbackImpl;
 
 //procurar o objeto remoto no Registry e devolver o stub
 public class Client {
@@ -33,12 +34,26 @@ public class Client {
                 boolean success = chat.register(nome, senha);
                 System.out.println(success ? "Registrado com sucesso!" : "Usuário já existe.");
             } else {
-                User user = chat.login(nome, senha);
-                if (user != null) {
-                    System.out.println("Bem-vindo, " + user.getName());
-                } else {
-                    System.out.println("Login inválido.");
-                }
+            	User user = chat.login(nome, senha);
+            	if (user != null) {
+            	    System.out.println("Bem-vindo, " + user.getName());
+
+            	    // Registra o callback para receber mensagens
+            	    ClientCallbackImpl callback = new ClientCallbackImpl();
+            	    chat.registerCallback(user.getName(), callback);
+
+            	    // Loop de envio de mensagens
+            	    while (true) {
+            	        System.out.print("\n> Enviar para: ");
+            	        String destinatario = sc.nextLine();
+            	        System.out.print("> Mensagem: ");
+            	        String msg = sc.nextLine();
+            	        chat.sendPrivateMessage(user.getName(), destinatario, msg);
+            	    }
+
+            	} else {
+            	    System.out.println("Login inválido.");
+            	}
             }
 			
 			// System.out.println(stub.sayHello());

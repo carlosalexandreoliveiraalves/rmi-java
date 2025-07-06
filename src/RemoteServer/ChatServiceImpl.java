@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import RemoteInterface.ChatService;
+import RemoteInterface.ClientCallback;
 import RemoteInterface.models.Group;
 import RemoteInterface.models.User;
 
@@ -16,6 +17,7 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
 	 private final Map<String, String> usersPassword;
 	 private final Map<String, User> onlineUsers;
 	 private final Map<String, Group> groups;
+	 private final Map<String, ClientCallback> userCallbacks = new ConcurrentHashMap<>();
 	
 	protected ChatServiceImpl() throws RemoteException {
 		super();
@@ -79,6 +81,14 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
 	@Override
 	public void sendPrivateMessage(String sender, String recipient, String message) throws RemoteException {
 		 System.out.printf("[Privado] %s -> %s: %s%n", sender, recipient, message);
+		 ClientCallback callback = userCallbacks.get(recipient);
+		 
+		 if (callback != null) {
+			 callback.receiveMessage(sender, message);
+		 } else {
+		     System.out.printf("⚠️ Usuário %s não possui callback registrado.\n", recipient);
+		 }
+	
 	}
 
 	@Override
@@ -117,6 +127,18 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
             return true;
         }
         return false;
+	}
+
+	@Override
+	public void registerCallback(String userName, ClientCallback callback) throws RemoteException {
+		userCallbacks.put(userName, callback);
+		
+	}
+
+	@Override
+	public void unregisterCallback(String userName) throws RemoteException {
+		userCallbacks.remove(userName);
+		
 	} 
 	
 	
